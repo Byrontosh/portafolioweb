@@ -41,9 +41,7 @@ app.use(express.urlencoded({extended:false})) // FORMULARIOS - VISTAS
 
 
 // Rutas 
-app.get('/',(req,res)=>{
-    res.render('index')
-})
+app.use(require('./routers/index.routes'))
 
 
 // Archivos estáticos
