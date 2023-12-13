@@ -4,6 +4,9 @@ const express = require('express')
 const path = require('path');
 // Importar handlebars
 const { engine }  = require('express-handlebars')
+// Importar methodOverride
+const methodOverride = require('method-override');
+
 
 
 // Inicializaciones
@@ -34,6 +37,8 @@ app.set('view engine','.hbs')
 
 // Middlewares 
 app.use(express.urlencoded({extended:false})) // FORMULARIOS - VISTAS
+app.use(methodOverride('_method'))
+
 
 
 // Variables globales
@@ -42,6 +47,8 @@ app.use(express.urlencoded({extended:false})) // FORMULARIOS - VISTAS
 
 // Rutas 
 app.use(require('./routers/index.routes'))
+app.use(require('./routers/portafolio.routes'))
+
 
 
 // Archivos estáticos
