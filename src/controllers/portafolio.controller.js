@@ -65,7 +65,7 @@ const updatePortafolio = async(req,res)=>{
     // Obtener un portafolio en base al id
     const portfolio = await Portfolio.findById(req.params.id).lean()
     // Que el usuario que actualice su portafolio sea el mismo que inicie eseión
-    if(portfolio.user.toString() !== req.user._id.toString()) return res.redirect('/portafolios')
+    if(!(portfolio.user.toString() !== req.user._id.toString())) return res.redirect('/portafolios')
     
     // Dessestructurar en req.body
     const {title,category,description}= req.body
