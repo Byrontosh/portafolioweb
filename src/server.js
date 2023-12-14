@@ -6,11 +6,18 @@ const path = require('path');
 const { engine }  = require('express-handlebars')
 // Importar methodOverride
 const methodOverride = require('method-override');
+// Importar passport
+const passport = require('passport');
+// Importar session
+const session = require('express-session');
 
 
 
 // Inicializaciones
 const app = express()
+require('./config/passport')
+
+
 
 
 // Configuraciones 
@@ -38,17 +45,34 @@ app.set('view engine','.hbs')
 // Middlewares 
 app.use(express.urlencoded({extended:false})) // FORMULARIOS - VISTAS
 app.use(methodOverride('_method'))
+// Establecer la sesión del usuario
+app.use(session({ 
+    secret: 'secret',
+    resave:true,
+    saveUninitialized:true
+}));
+// Inicialización
+app.use(passport.initialize())
+// Mantener la sesión del usuario
+app.use(passport.session())
+
 
 
 
 // Variables globales
+app.use((req,res,next)=>{
+    res.locals.user = req.user?.name || null
+    next()
+})
+
+
 
 
 
 // Rutas 
 app.use(require('./routers/index.routes'))
 app.use(require('./routers/portafolio.routes'))
-
+app.use(require('./routers/user.routes'))
 
 
 // Archivos estáticos

@@ -1,6 +1,16 @@
 // Importación de la Clase Router
 const {Router} = require('express')
+
+
+
+
 const { renderIndex, renderLogin } = require('../controllers/index.controllers')
+
+
+
+
+
+
 
 // Importación de las funciones
 
