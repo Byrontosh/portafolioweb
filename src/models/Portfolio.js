@@ -19,7 +19,11 @@ const portfolioSchema = new Schema({
     user:{
         type:String,
         required:true
-    }   
+    },
+    image:{
+        public_id:String,
+        secure_url:String
+    } 
 },
 {
     timestamps:true
@@ -27,3 +31,7 @@ const portfolioSchema = new Schema({
 
 // Exportación del modelo y del esquema
 module.exports = model('portfolio',portfolioSchema)
+
+
+
+

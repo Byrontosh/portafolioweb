@@ -10,6 +10,9 @@ const methodOverride = require('method-override');
 const passport = require('passport');
 // Importar session
 const session = require('express-session');
+// Importar fileUpload
+const fileUpload = require('express-fileupload')
+
 
 
 
@@ -39,6 +42,14 @@ app.engine('.hbs',engine({
 }))
 // Establecer el motor de plantillas y su extensión
 app.set('view engine','.hbs')
+
+// Configuraciones de fileUpload
+app.use(fileUpload({
+    // Establecer archivo temporales
+    useTempFiles : true,
+    // Especificar el directorio
+    tempFileDir : './uploads'
+}));
 
 
 

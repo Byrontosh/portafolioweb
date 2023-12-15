@@ -1,6 +1,10 @@
 
 // Importar el modelo 
 const Portfolio = require('../models/Portfolio')
+// Importar el método 
+const { uploadImage, deleteImage } = require('../config/cloudinary')
+// Importar fs
+const fs = require('fs-extra')
 
 
 
@@ -37,6 +41,17 @@ const createNewPortafolio = async (req,res)=>{
     const newPortfolio = new Portfolio(req.body)
     // Asociar el usuario que inicia sesión al portafolio
     newPortfolio.user = req.user._id
+    // Validar la imágen
+    if(!(req.files?.image)) return res.send("Se requiere una imagen")
+    // Invocar el método para que se almacene en cloudinary
+    const imageUpload = await uploadImage(req.files.image.tempFilePath)
+    newPortfolio.image = {
+        public_id:imageUpload.public_id,
+        secure_url:imageUpload.secure_url
+    }
+    // Eliminar los archivos temporales
+    await fs.unlink(req.files.image.tempFilePath)
+    
     // Almacenar en la BDD
     await newPortfolio.save()
     res.redirect('/portafolios')
@@ -62,19 +77,32 @@ const renderEditPortafolioForm = async(req,res)=>{
 
 // MÉTODO PARA ACTUALIZAR EN LA BDD LO CAPTURADO EN EL FORM 
 const updatePortafolio = async(req,res)=>{
-    // Obtener un portafolio en base al id
     const portfolio = await Portfolio.findById(req.params.id).lean()
-    // Que el usuario que actualice su portafolio sea el mismo que inicie eseión
-    if(!(portfolio.user.toString() !== req.user._id.toString())) return res.redirect('/portafolios')
+    if(portfolio._id != req.params.id) return res.redirect('/portafolios')
     
-    // Dessestructurar en req.body
-    const {title,category,description}= req.body
-    // Actualizar en la BDD
-    await Portfolio.findByIdAndUpdate(req.params.id,{title,category,description})
-    // Redireccionar a la vista portafolios
+    // Verificar si el usuario quiere actualizar la imagen o solo los campos extras
+    if(req.files?.image) {
+        if(!(req.files?.image)) return res.send("Se requiere una imagen")
+        await deleteImage(portfolio.image.public_id)
+        const imageUpload = await uploadImage(req.files.image.tempFilePath)
+        const data ={
+            title:req.body.title || portfolio.name,
+            category: req.body.category || portfolio.category,
+            description:req.body.description || portfolio.description,
+            image : {
+            public_id:imageUpload.public_id,
+            secure_url:imageUpload.secure_url
+            }
+        }
+        await fs.unlink(req.files.image.tempFilePath)
+        await Portfolio.findByIdAndUpdate(req.params.id,data)
+    }
+    else{
+        const {title,category,description}= req.body
+        await Portfolio.findByIdAndUpdate(req.params.id,{title,category,description})
+    }
     res.redirect('/portafolios')
 }
-
 
 
 
@@ -87,9 +115,13 @@ const updatePortafolio = async(req,res)=>{
 const deletePortafolio = async(req,res)=>{
 
     // Utilizar el método findByIdAndDelete
-    await Portfolio.findByIdAndDelete(req.params.id)
+    const portafolio = await Portfolio.findByIdAndDelete(req.params.id)
+    await deleteImage(portafolio.image.public_id)
     res.redirect('/portafolios')
 }
+
+
+
 
 
 

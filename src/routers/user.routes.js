@@ -1,6 +1,7 @@
 // Importación de la Clase Router
 const{Router} = require('express')
 const { renderRegisterForm, registerNewUser, renderLoginForm, loginUser, logoutUser } = require('../controllers/user.controller')
+const { redirectIfAuthenticated } = require('../helpers/validate-auth')
 
 
 // creación de la instancia 
@@ -13,8 +14,16 @@ router.get('/user/register',renderRegisterForm)
 router.post('/user/register',registerNewUser)
 
 
+
+
+
 // Ruta para mostrar el fomrulario de login
-router.get('/user/login',renderLoginForm)
+router.get('/user/login', redirectIfAuthenticated, renderLoginForm)
+
+
+
+
+
 // Ruta para realizar en inicio de sesión con los datos del form
 router.post('/user/login',loginUser)
 
