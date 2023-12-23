@@ -1,24 +1,22 @@
-// Controlador - Trabajar en la lógica de la aplicación software
+
+// Importar el mpdelo
+const Portfolio = require('../models/Portfolio')
 
 
-// Renderizar la página inicial (home)
-const renderIndex = (req,res)=>{
-    res.render('index')
+// Método para listar todos los portafolios
+const renderIndex = async(req,res)=>{
+    // Consultar todos los portafolios, transformar a JSON y almacenarlos en la variable portfolios
+    const portfolios = await Portfolio.find().lean()
+
+    // Invocar a la vista index y pasar la variable portfolios
+    res.render('index',{portfolios})
 }
 
 
-// Renderizar la página login
-const renderLogin = (req,res)=>{
-    res.render('login')
-}
 
 
 
-
-
-
-// Exportación de las funciones 
+// Exportación de la función 
 module.exports = {
-    renderIndex,
-    renderLogin
+    renderIndex
 }

@@ -4,16 +4,8 @@ const {Router} = require('express')
 
 
 
-const { renderIndex, renderLogin } = require('../controllers/index.controllers')
-
-
-
-
-
-
-
 // Importación de las funciones
-
+const { renderIndex } = require('../controllers/index.controllers')
 
 
 // creación de la instancia 
@@ -22,11 +14,6 @@ const router = Router()
 
 // Ruta inicial (home - index)
 router.get('/',renderIndex)
-
-
-
-// Ruta login
-router.get('/login', renderLogin)
 
 
 
