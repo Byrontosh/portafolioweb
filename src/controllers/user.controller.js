@@ -5,6 +5,10 @@ const User = require('../models/User')
 // Importación de passport
 const passport = require("passport")
 
+// Importar el método sendMailToUser
+const { sendMailToUser } = require("../config/nodemailer")
+
+
 
 
 
@@ -30,11 +34,29 @@ const registerNewUser = async(req,res)=>{
     const newUser = await new User({name,email,password,confirmpassword})
     // Encriptrar el password
     newUser.password = await newUser.encrypPassword(password)
+    // Establecer el token
+    const token = newUser.crearToken()
+    // Enviar el correo electrónico
+    sendMailToUser(email,token)
     // Guardar en BDD
     newUser.save()
     // Redireccionar a la vista login
     res.redirect('/user/login')
 }
+
+
+// Método para confirmar el email
+const confirmEmail = async(req,res)=>{
+    // Validar si existe el token 
+    if(!(req.params.token)) return res.send("Lo sentimos, no se puede validar la cuenta")
+    // Obtener el usuario en base al token
+    const userBDD = await User.findOne({token:req.params.token})
+    userBDD.token = null
+    userBDD.confirmEmail=true
+    await userBDD.save()
+    res.send('Token confirmado, ya puedes iniciar sesión');
+}
+
 
 
 
@@ -71,5 +93,6 @@ module.exports={
     registerNewUser,
     renderLoginForm,
     loginUser,
-    logoutUser
+    logoutUser,
+    confirmEmail
 }
